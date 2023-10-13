@@ -2551,8 +2551,9 @@ function addImport() {
                             importFiles += item + ',';
                         }
                         let import_statement = `import { ${importFiles} } from '${import_path + k}';\n`;
+                        let message = import_path.concat(k);
                         //判断文件头部是否已经有导入语句
-                        if (content.includes(import_statement)) {
+                        if (content.startsWith("import") && content.includes("from") && content.includes(message)) {
                             console.log(getFileName(file_path), '文件中使用了拓展API', '已经导入过');
                             break;
                         }
