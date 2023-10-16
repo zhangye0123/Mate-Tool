@@ -2215,6 +2215,7 @@ apiReplaceStr = {
     'mw.IntegratedMover.asyncSpawnGameObject(': "SpawnManager.wornAsyncSpawn<mw.IntegratedMover>(",
 
     'mw.GameObject.spawn(': "SpawnManager.spawn(",
+    'GameObject.spawn(': "SpawnManager.spawn(",
     'mw.AdvancedVehicle.spawn(': "SpawnManager.spawn<mw.AdvancedVehicle>(",
     'mw.Effect.spawn(': "SpawnManager.spawn<mw.Effect>(",
     'mw.Sound.spawn(': "SpawnManager.spawn<mw.Sound>(",
@@ -2223,6 +2224,7 @@ apiReplaceStr = {
     'mw.Interactor.spawn(': "SpawnManager.spawn<mw.Interactor>(",
     'mw.IntegratedMover.spawn(': "SpawnManager.spawn<mw.IntegratedMover>(",
     'mw.GameObject.spawn<': 'SpawnManager.spawn<',
+    'GameObject.spawn<': 'SpawnManager.spawn<',
 
     'mw.GameObject.asyncSpawn(': "SpawnManager.asyncSpawn(",
     'mw.AdvancedVehicle.asyncSpawn(': "SpawnManager.asyncSpawn<mw.AdvancedVehicle>(",
@@ -2324,6 +2326,9 @@ apiReplaceStr = {
     'mw.UIManager': 'mw.UIService',
     'SoundService.get3DSoundGameObject': 'SoundService.get3DSoundById',
     'mw.asyncGetPlayer(': 'Player.asyncGetPlayer(',
+
+    'DataCenterS.onPlayerJoined': 'DataCenterS.onPlayerJoin',
+    'DataCenterS.onPlayerLeft': 'DataCenterS.onPlayerLeave',
 }
 
 // 需要优先替换的字符串
