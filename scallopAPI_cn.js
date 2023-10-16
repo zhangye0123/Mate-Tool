@@ -1926,7 +1926,7 @@ apiRegexList = {
     "mw\\.GameObject\\.asyncFind\\(": "GameObject.asyncFindGameObjectById(",
     "GameObject\\.asyncFind\\(": "GameObject.asyncFindGameObjectById(",
     "\\.asyncGetScriptByName\\(": ".getScriptByName(",
-    "\\.attachToGameObject\\((.*?)\\)": ".parent = $1",
+    "\\.attachToGameObject\\((.*?)": ".parent = ($1",
     "\\.deleteDestroyCallback\\(": ".onDestroyDelegate.remove(",
     "\\.detachFromGameObject\\(\\)": ".parent = null",
     "mw\\.GameObject\\.find\\(": "GameObject.findGameObjectById(",
@@ -2150,7 +2150,8 @@ apiRegexList = {
     //补充
     'DataStorage.asyncSetCustomData\\(': 'DataStorage.asyncSetData(',
     '.particleLength\\\b': '.timeLength',
-
+    '\\.getSourceAssetGuid\\(\\)': '.assetId',
+    '\\.setAudioAssetByGuid\\(': '.setSoundAsset('
 
 
 }
