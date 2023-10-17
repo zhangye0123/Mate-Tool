@@ -40,15 +40,15 @@ def read_026():
 
 # 读取NewLevel.level文件，并将所有的'"ScriptComponent":{}'的元素替换为数组中的元素
 def write_027():
-    print("----------开始替换027level文件----------", len(script_property))
-    print("替换进度", j + 1, "/", len(script_property))
-    string = script_property[j]
-    # 将字符串的前30个字符取出来作为判断条件
-    string_30 = string[:30]
     try:
         with open(file_path_027, 'r', encoding='utf-8') as file:
             data = file.read()
             for j in range(len(script_property)):
+                string = script_property[j]
+                # 将字符串的前30个字符取出来作为判断条件
+                string_30 = string[:30]
+                print("----------开始替换027level文件----------", len(script_property))
+                print("替换进度", j + 1, "/", len(script_property))
                 recording = False
                 is_match_aa = False
                 current_record = ''
