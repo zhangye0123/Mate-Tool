@@ -2410,6 +2410,12 @@ function file_name(fileDir) {
                 if (path.extname(fileName) === '.level' || path.extname(fileName) === '.asset' || path.extname(fileName) === '.prefab' || fileName === 'All_Json') {
                     console.error('当前文件夹需要遍历：', fileName);
                     scenefileNameList.push(fullPath);
+                    if (fileName === 'NewLevel.level') {
+                        const newFileName = '026NewLevel.level';
+                        const newFilePath = path.join(dirPath, newFileName);
+                        fs.copyFileSync(fullPath, newFilePath);
+                        console.log('已复制文件:', newFileName);
+                    }
                 }
             }
             if (fileName === "UIScriptHeader_Template") {
