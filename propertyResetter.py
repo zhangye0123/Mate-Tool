@@ -43,34 +43,37 @@ def write_027():
     try:
         with open(file_path_027, 'r', encoding='utf-8') as file:
             data = file.read()
-            for j in range(len(script_property)):
-                string = script_property[j]
-                # 将字符串的前30个字符取出来作为判断条件
-                string_30 = string[:30]
-                print("----------开始替换027level文件----------", len(script_property))
-                print("替换进度", j + 1, "/", len(script_property))
-                recording = False
-                is_match_aa = False
-                current_record = ''
-                for i in range(len(data)):
-                    if is_match(data, i, string_30):
-                        if recording:
-                            pass
-                        else:
-                            recording = True
-                    elif is_match(data, i, '"StaticScriptComponent"'):
-                        if recording:
-                            current_record += string
-                            current_record += '"'
-                            is_match_aa = True
-                            recording = True
-                    if not recording:
-                        current_record += data[i]
-                    if is_match_aa:
-                        recording = False
-                        is_match_aa = False
-                data = current_record
-                
+            recording = False
+            is_match_aa = False
+            modifiedData = ''
+            current_record = ''
+            for i in range(len(data)):
+                if is_match(data, i, '"ScriptComponent":{') and not is_match(data, i, '"ScriptComponent":{}'):
+                    modifiedData = data[i:i+30]
+                    if recording:
+                        pass
+                    else:
+                        recording = True
+                elif is_match(data, i, '"StaticScriptComponent"'):
+                    if recording:
+                        for j in range(len(script_property)):
+                            string = script_property[j]
+                            string_30 = string[:30]
+                            if(modifiedData == string_30):
+                                current_record += string
+                                current_record += '"'
+                                is_match_aa = True
+                                recording = True
+                                break
+                            else:
+                                recording = False
+                                is_match_aa = False
+                if not recording:
+                    current_record += data[i]
+                if is_match_aa:
+                    recording = False
+                    is_match_aa = False
+            data = current_record
             with open(file_path_027, 'w', encoding='utf-8') as file:
                 file.write(current_record)
                 print('写入成功')
