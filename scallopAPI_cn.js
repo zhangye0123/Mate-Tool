@@ -856,8 +856,8 @@ export class GeneralManager {
         AdsService.showAd(adsType, isSuccess => {
             if (isSuccess) {
                 callback(AdsState.Success);
+                if (adsType == AdsType.Reward) callback(AdsState.Reward);
                 callback(AdsState.Close);
-                callback(AdsState.Reward);
             } else {
                 callback(AdsState.Fail);
             }
