@@ -4,99 +4,86 @@ const fs = require('fs');
 const file_path = "026NewLevel.level";
 // 027Level文件
 const file_path2 = "NewLevel.level";
-const replaceDataDict = {};
+const replace_data_dict = {};
+const static_replace_data_dict = {};
 
-function main() {
-    // 读取第一个文件
-    fs.readFile(file_path, 'utf-8', (err, data) => {
-        if (err) {
-            console.error(err);
-            return;
-        }
-        // 去除BOM字符
-        if (data.charCodeAt(0) === 0xFEFF) {
-            data = data.slice(1);
-        }
-
-        let jsonData;
-        try {
-            jsonData = JSON.parse(data);
-            // 在这里可以使用 jsonData 对象
-        } catch (err) {
-            console.error("JSON解析错误: " + err);
-            return;
-        }
-        const sceneList = jsonData["Scene"];
-
-        for (const sceneItem of sceneList) {
-            const script = sceneItem["Script"];
-
+function traverseJSON(obj) {
+    if (typeof obj === 'object' && obj !== null) {
+        if ("Script" in obj) {
+            const script = obj["Script"];
             if (script) {
                 const scriptComponent = script["ScriptComponent"];
-
                 if (scriptComponent) {
-                    for (const key of Object.keys(scriptComponent)) {
-                        const value = scriptComponent[key];
-
-                        if (value["cameraMode"] && value["springArmRelativeLocation"]) {
-                            continue;
-                        }
-
-                        replaceDataDict[key] = value;
+                    for (const [k, v] of Object.entries(scriptComponent)) {
+                        replace_data_dict[k] = v;
+                    }
+                }
+                const staticScriptComponent = script["StaticScriptComponent"];
+                if (staticScriptComponent) {
+                    for (const [k, v] of Object.entries(staticScriptComponent)) {
+                        static_replace_data_dict[k] = v;
                     }
                 }
             }
         }
+        for (const value of Object.values(obj)) {
+            traverseJSON(value);
+        }
+    } else if (Array.isArray(obj)) {
+        for (const item of obj) {
+            traverseJSON(item);
+        }
+    }
+}
 
-        // 读取第二个文件
-        fs.readFile(file_path2, 'utf-8', (err, data) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-
-            // 去除BOM字符
-            if (data.charCodeAt(0) === 0xFEFF) {
-                data = data.slice(1);
-            }
-
-            let jsonData;
-            try {
-                jsonData = JSON.parse(data);
-                // 在这里可以使用 jsonData 对象
-            } catch (err) {
-                console.error("JSON解析错误: " + err);
-                return;
-            }
-            const sceneList2 = jsonData["Scene"];
-
-            for (const sceneItem of sceneList2) {
-                const script = sceneItem["Script"];
-
-                if (script) {
-                    const scriptComponent = script["ScriptComponent"];
-
-                    if (scriptComponent) {
-                        for (const key of Object.keys(scriptComponent)) {
-                            if (replaceDataDict[key]) {
-                                scriptComponent[key] = replaceDataDict[key];
-                            }
-                        }
+function writeTraverseJSON(obj) {
+    if (typeof obj === 'object' && obj !== null) {
+        if ("Script" in obj) {
+            const script = obj["Script"];
+            if (script) {
+                const scriptComponent = script["ScriptComponent"];
+                if (scriptComponent) {
+                    for (const [k, v] of Object.entries(scriptComponent)) {
+                        scriptComponent[k] = replace_data_dict[k] || v;
+                    }
+                }
+                const staticScriptComponent = script["StaticScriptComponent"];
+                if (staticScriptComponent) {
+                    for (const [k, v] of Object.entries(staticScriptComponent)) {
+                        staticScriptComponent[k] = static_replace_data_dict[k] || v;
                     }
                 }
             }
+        }
+        for (const value of Object.values(obj)) {
+            writeTraverseJSON(value);
+        }
+    } else if (Array.isArray(obj)) {
+        for (const item of obj) {
+            writeTraverseJSON(item);
+        }
+    }
+    return obj;
+}
 
-            // 写入更新后的数据
-            const outStr = JSON.stringify(jsonData, null, 4);
-            fs.writeFile(file_path2, outStr, 'utf-8', (err) => {
-                if (err) {
-                    console.error(err);
-                } else {
-                    console.log("文件已更新。");
-                }
-            });
-        });
-    });
+function main() {
+
+    let str1 = fs.readFileSync(file_path, 'utf-8')
+    // 去除BOM字符
+    if (str1.charCodeAt(0) === 0xFEFF) str1 = str1.slice(1);
+    const data = JSON.parse(str1);
+    traverseJSON(data);
+
+    let str2 = fs.readFileSync(file_path2, 'utf-8');
+    // 去除BOM字符
+    if (str2.charCodeAt(0) === 0xFEFF) str2 = str2.slice(1);
+    let data2 = JSON.parse(str2);
+    data2 = writeTraverseJSON(data2);
+
+    const outStr = JSON.stringify(data2, null, 2);
+    fs.writeFileSync(file_path2, outStr, 'utf-8');
+
+    console.log("脚本修改完成！");
 }
 
 main();
