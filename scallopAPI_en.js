@@ -2375,6 +2375,29 @@ const statAsync = promisify(fs.stat);
 const unlinkAsync = promisify(fs.unlink);
 const rmdirAsync = promisify(fs.rmdir);
 
+async function readFileAsyncaa(path) {
+    let text = (fs.readFileSync(path));
+    const encoding = detectEncoding(text);
+    if (encoding !== 'utf8') {
+        text = (await readFileAsync(path, encoding));
+    } else {
+        text = (await readFileAsync(path, 'utf8'));
+    }
+    text = text.replace(/^\uFEFF/, '');
+    return text;
+}
+
+function detectEncoding(buffer) {
+    if (buffer.length >= 2) {
+        if (buffer[0] === 254 && buffer[1] === 255) {
+            return "utf16be";
+        } else if (buffer[0] === 255 && buffer[1] === 254) {
+            return "utf16le";
+        }
+    }
+    return "utf8";
+}
+
 async function recordModifiedFile(filePath) {
     try {
         await writeFileAsync(recordFile, filePath + '\n', { flag: 'a' });
@@ -2386,7 +2409,7 @@ async function recordModifiedFile(filePath) {
 
 async function isFileModified(filePath) {
     try {
-        const lines = (await readFileAsync(recordFile, 'utf8')).split('\n');
+        const lines = (await readFileAsyncaa(recordFile)).split('\n');
         return lines.includes(filePath);
     } catch (err) {
         console.error(err);
@@ -2478,7 +2501,7 @@ async function changeFile(fileName, tempTxt, isScene) {
 
     try {
         console.log('开始替换文件：', fileName);
-        const content = await readFileAsync(fileName, 'utf8');
+        const content = await readFileAsyncaa(fileName);
         let modifiedContent;
 
         if (isScene) {
