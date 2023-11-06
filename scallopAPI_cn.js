@@ -885,13 +885,13 @@ export class GeneralManager {
     }
 
     public static modifyaddOutlineEffect(obj: mw.GameObject, OutlineColor?: mw.LinearColor, OutlineWidth?: number, OutlineDepthOffset?: number, OutlineClampValue?: number, considerCameraPosition?: boolean, outlineSilhouetteOnly?: boolean): void {
-        if (obj instanceof mw.Model) {
+        if (obj instanceof mw.Model || obj instanceof Character) {
             obj.setOutline(true, OutlineColor, OutlineWidth);
         }
     }
 
     public static modifyRemoveOutlineEffect(obj: mw.GameObject) {
-        if (obj instanceof mw.Model) {
+        if (obj instanceof mw.Model || obj instanceof Character) {
             obj.setOutline(false);
         }
     }
@@ -2465,7 +2465,7 @@ function replaceStr(content, replaceStr) {
 async function changeFile(fileName, tempTxt, isScene) {
     if (await isFileModified(fileName)) {
         console.log('当前文件已经修改过，跳过：', fileName);
-        // return;
+        return;
     }
 
     try {
