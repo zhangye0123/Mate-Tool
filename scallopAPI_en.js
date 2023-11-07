@@ -812,19 +812,16 @@ export class GeneralManager {
 
     }
 
-    /**Playing effects on a character's anchor */
     public static async asyncRpcGetData(key: string): Promise<any> {
         let value = await DataStorage.asyncGetData(key);
         return value.data;
     }
 
-    /**Asynchronously fetch players */
     public static async asyncRpcGetPlayer(playerId: number): Promise<mw.Player> {
         let player = Player.getPlayer(playerId);
         return Promise.resolve(player);
     }
 
-    /**Asynchronously get custom data */
     public static rpcPlayEffectOnPlayer(source: string, target: mw.Player | mw.Character, slotType: mw.HumanoidSlotType, loopCount?: number, offset?: mw.Vector, rotation?: mw.Rotation, scale?: mw.Vector): number {
         let duration = undefined;
         if (loopCount < 0) {
@@ -841,7 +838,6 @@ export class GeneralManager {
         });
     }
 
-    /**Playing effects on a GameObject */
     public static rpcPlayEffectOnGameObject(source: string, target: mw.GameObject, loopCount?: number, offset?: mw.Vector, rotation?: mw.Rotation, scale?: mw.Vector): number {
         let duration = undefined;
         if (loopCount < 0) {
@@ -857,7 +853,6 @@ export class GeneralManager {
         });
     }
 
-    /**Play effect at location */
     public static rpcPlayEffectAtLocation(source: string, location: mw.Vector, loopCount?: number, rotation?: mw.Rotation, scale?: mw.Vector): number {
         let duration = undefined;
         if (loopCount < 0) {
@@ -872,7 +867,6 @@ export class GeneralManager {
         })
     }
 
-    /**Play ads */
     public static modifyShowAd(adsType: AdsType, callback: (state: AdsState) => void): void {
         AdsService.showAd(adsType, isSuccess => {
             if (isSuccess) {
@@ -885,9 +879,6 @@ export class GeneralManager {
         });
     }
 
-    /**
-     * Enter interactive state
-     */
     public static modiftEnterInteractiveState(inter: mw.Interactor, characterObj: mw.GameObject): Promise<boolean> {
         if (!(characterObj instanceof mw.Character)) {
             return Promise.resolve(false);
@@ -903,15 +894,11 @@ export class GeneralManager {
         });
     }
 
-    /**
-     * Exit interactive state
-     */
     public static modifyExitInteractiveState(inter: mw.Interactor, Location: Vector, stance?: string): Promise<boolean> {
         let result = inter.leave(Location, null, stance);
         return Promise.resolve(result);
     }
 
-    /**Outline effect */
     public static modifyaddOutlineEffect(obj: mw.GameObject, OutlineColor?: mw.LinearColor, OutlineWidth?: number, OutlineDepthOffset?: number, OutlineClampValue?: number, considerCameraPosition?: boolean, outlineSilhouetteOnly?: boolean): void {
         if (obj instanceof mw.Model || obj instanceof Character) {
             obj.setOutline(true, OutlineColor, OutlineWidth);
@@ -1121,7 +1108,7 @@ sceneRegexList = {
     "mw\\.GameObject\\.asyncFind\\(": "GameObject.asyncFindGameObjectById(",
     "GameObject\\.asyncFind\\(": "GameObject.asyncFindGameObjectById(",
     "\\.asyncGetScriptByName\\(": ".getScriptByName(",
-    "\\.attachToGameObject\\((.*?)": ".parent = ($1",
+    "\\.attachToGameObject\\((.*?)\\)": ".parent = $1",
     "\\.deleteDestroyCallback\\(": ".onDestroyDelegate.remove(",
     "\\.detachFromGameObject\\(\\)": ".parent = null",
     "mw\\.GameObject\\.find\\(": "GameObject.findGameObjectById(",
@@ -1957,7 +1944,7 @@ apiRegexList = {
     "mw\\.GameObject\\.asyncFind\\(": "GameObject.asyncFindGameObjectById(",
     "GameObject\\.asyncFind\\(": "GameObject.asyncFindGameObjectById(",
     "\\.asyncGetScriptByName\\(": ".getScriptByName(",
-    "\\.attachToGameObject\\((.*?)\\)": ".parent = $1",
+    "\\.attachToGameObject\\((.*?)": ".parent = ($1",
     "\\.deleteDestroyCallback\\(": ".onDestroyDelegate.remove(",
     "\\.detachFromGameObject\\(\\)": ".parent = null",
     "mw\\.GameObject\\.find\\(": "GameObject.findGameObjectById(",
@@ -2398,9 +2385,12 @@ function detectEncoding(buffer) {
     return "utf8";
 }
 
+var recordContent = '';
+
 async function recordModifiedFile(filePath) {
     try {
-        await writeFileAsync(recordFile, filePath + '\n', { flag: 'a' });
+        // await writeFileAsync(recordFile, filePath + '\n', { flag: 'a' });
+        recordContent += filePath + '\n';
         console.log('文件路径已成功记录！');
     } catch (err) {
         console.error(err);
@@ -2494,11 +2484,6 @@ function replaceStr(content, replaceStr) {
 }
 
 async function changeFile(fileName, tempTxt, isScene) {
-    if (await isFileModified(fileName)) {
-        console.log('当前文件已经修改过，跳过：', fileName);
-        return;
-    }
-
     try {
         console.log('开始替换文件：', fileName);
         const content = await readFileAsyncaa(fileName);
@@ -2526,13 +2511,16 @@ async function changeFile(fileName, tempTxt, isScene) {
 }
 
 async function main() {
+    try {
+        if (fs.existsSync(recordFile)) {
+            return;
+        }
+    } catch (error) {
+        console.error(error);
+    }
     const { scenefileNameList, apifileNameList } = file_name(process.cwd());
 
     try {
-        if (!fs.existsSync(recordFile)) {
-            await writeFileAsync(recordFile, '');
-        }
-
         if (!fs.existsSync(sceneTempTxt)) {
             await fs.promises.mkdir(sceneTempTxt, { recursive: true });
         }
@@ -2549,6 +2537,7 @@ async function main() {
         for (const fileName of apifileNameList) {
             await changeFile(fileName, apiTempTxt, false);
         }
+        await writeFileAsync(recordFile, recordContent, 'utf8');
     } catch (err) {
         console.error(err);
     }

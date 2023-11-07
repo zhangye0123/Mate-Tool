@@ -2367,9 +2367,12 @@ function detectEncoding(buffer) {
     return "utf8";
 }
 
+var recordContent = '';
+
 async function recordModifiedFile(filePath) {
     try {
-        await writeFileAsync(recordFile, filePath + '\n', { flag: 'a' });
+        // await writeFileAsync(recordFile, filePath + '\n', { flag: 'a' });
+        recordContent += filePath + '\n';
         console.log('文件路径已成功记录！');
     } catch (err) {
         console.error(err);
@@ -2463,11 +2466,6 @@ function replaceStr(content, replaceStr) {
 }
 
 async function changeFile(fileName, tempTxt, isScene) {
-    if (await isFileModified(fileName)) {
-        console.log('当前文件已经修改过，跳过：', fileName);
-        return;
-    }
-
     try {
         console.log('开始替换文件：', fileName);
         const content = await readFileAsyncaa(fileName);
@@ -2495,13 +2493,16 @@ async function changeFile(fileName, tempTxt, isScene) {
 }
 
 async function main() {
+    try {
+        if (fs.existsSync(recordFile)) {
+            return;
+        }
+    } catch (error) {
+        console.error(error);
+    }
     const { scenefileNameList, apifileNameList } = file_name(process.cwd());
 
     try {
-        if (!fs.existsSync(recordFile)) {
-            await writeFileAsync(recordFile, '');
-        }
-
         if (!fs.existsSync(sceneTempTxt)) {
             await fs.promises.mkdir(sceneTempTxt, { recursive: true });
         }
@@ -2518,6 +2519,7 @@ async function main() {
         for (const fileName of apifileNameList) {
             await changeFile(fileName, apiTempTxt, false);
         }
+        await writeFileAsync(recordFile, recordContent, 'utf8');
     } catch (err) {
         console.error(err);
     }
