@@ -2151,8 +2151,9 @@ apiRegexList = {
     'DataStorage.asyncSetCustomData\\(': 'DataStorage.asyncSetData(',
     '.particleLength\\\b': '.timeLength',
     '\\.getSourceAssetGuid\\(\\)': '.assetId',
-    '\\.setAudioAssetByGuid\\(': '.setSoundAsset('
-
+    '\\.setAudioAssetByGuid\\(': '.setSoundAsset(',
+    '\\s+lineTrace\\(': 'QueryUtil.lineTrace(',
+    '=lineTrace\\(': '=QueryUtil.lineTrace(',
 
 }
 // 需要替换的字符串  key:旧api   value：新api
