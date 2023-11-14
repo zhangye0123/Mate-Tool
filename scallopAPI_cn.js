@@ -802,11 +802,6 @@ export class GeneralManager {
         return value.data;
     }
 
-    public static async asyncRpcGetPlayer(playerId: number): Promise<mw.Player> {
-        let player = Player.getPlayer(playerId);
-        return Promise.resolve(player);
-    }
-
     public static rpcPlayEffectOnPlayer(source: string, target: mw.Player | mw.Character, slotType: mw.HumanoidSlotType, loopCount?: number, offset?: mw.Vector, rotation?: mw.Rotation, scale?: mw.Vector): number {
         let duration = undefined;
         if (loopCount < 0) {
